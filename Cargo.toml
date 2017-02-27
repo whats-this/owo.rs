@@ -4,6 +4,4 @@ version = "0.1.0"
 authors = ["Okashi <okashi@fourchin.net>"]
 
 [dependencies]
-hyper = "*"
-url = "*"
 curl = "*"
