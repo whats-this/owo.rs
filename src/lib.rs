@@ -1,9 +1,11 @@
-use std::io::{stdout, Write};
+
+
+pub mod shortener {
+use std::io::{stdout, Write}; 
 extern crate curl;
-use curl::easy::Easy;
+use self::curl::easy::Easy;
 
 
-// Write the contents of rust-lang.org to stdo
 fn get_content(url: &str) {
     let mut easy = Easy::new();
     easy.url(&format!("{}", url )).unwrap();
@@ -14,7 +16,7 @@ fn get_content(url: &str) {
 }
 
 
-fn shorten(key: &str, s_url: &str) {
+pub fn shorten(key: &str, s_url: &str) {
     get_content(&format!("https://api.awau.moe/shorten/polr?action=shorten&key={}&url={}", key, s_url));
-    //println!("You typed: {}",s);
+}
 }

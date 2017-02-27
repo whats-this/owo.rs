@@ -1,7 +1,9 @@
 [package]
 name = "owo"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Okashi <okashi@fourchin.net>"]
+description = "A owo.whats-th.is lib for Rust"
+license = "MIT"
 
 [dependencies]
-curl = "*"
+curl = "0.4.6"
