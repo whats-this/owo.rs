@@ -1,9 +1,34 @@
 [package]
 name = "owo"
-version = "0.1.1"
-authors = ["Okashi <okashi@fourchin.net>"]
-description = "A owo.whats-th.is lib for Rust"
-license = "MIT"
+version = "0.2.0"
+authors = ["Okashi <okashi@fourchin.net>", "Zeyla Hellyer <zey@zey.moe>"]
 
-[dependencies]
-curl = "0.4.6"
+[dependencies.hyper]
+optional = true
+version = "~0.11"
+
+[dependencies.hyper-tls]
+optional = true
+version = "~0.1"
+
+[dependencies.reqwest]
+git = "https://github.com/seanmonstar/reqwest"
+optional = true
+
+[dependencies.serde]
+optional = true
+version = "^1.0"
+
+[dependencies.serde_derive]
+optional = true
+version = "^1.0"
+
+[dependencies.serde_json]
+optional = true
+version = "^1.0"
+
+[features]
+default = ["reqwest-support"]
+hyper-support = ["hyper", "hyper-tls"]
+reqwest-support = ["reqwest", "serde-items"]
+serde-items = ["serde", "serde_derive", "serde_json"]

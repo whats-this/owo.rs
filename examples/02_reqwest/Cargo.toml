@@ -1,0 +1,11 @@
+[package]
+name = "02_reqwest"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+
+[dependencies.reqwest]
+git = "https://github.com/seanmonstar/reqwest"
+
+[dependencies.owo]
+features = ["reqwest-support"]
+path = "../../"

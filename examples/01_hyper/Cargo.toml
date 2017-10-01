@@ -1,0 +1,15 @@
+[package]
+name = "01_hyper"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+
+[dependencies]
+futures = "~0.1"
+hyper = "~0.11"
+hyper-tls = "~0.1"
+tokio-core = "0.1"
+
+[dependencies.owo]
+default-features = false
+features = ["hyper-support"]
+path = "../../"

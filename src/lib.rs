@@ -1,48 +1,129 @@
-pub mod shortener {
-use std::io::{stdout, Write};
-extern crate curl;
-use self::curl::easy::Easy;
+//! # owo.rs
+//!
+//! A Rust client for the owo.whats-th.is API, offering implementations for both
+//! asynchronous hyper (v0.11) and synchronous reqwest (v0.7).
+//!
+//! ### Compile Features
+//!
+//! - **hyper-support**: Compiles with `hyper` support
+//! - **reqwest-support**: Compiles with `reqwest` support (*default*)
 
+//! **note**: `hyper` support is minimal due to lack of existing ecosystem
+//! multipart support, and is currently restricted to URL shortening
+//!
+//! ### Installation
+//!
+//! Add the following to your `Cargo.toml` file:
+//!
+//! ```toml
+//! [dependencies]
+//! owo = "~0.2"
+//! ```
+//!
+//! To enable both `hyper` and `reqwest` support:
+//!
+//! ```toml
+//! [dependencies.owo]
+//! features = ["hyper", "reqwest"]
+//! version = "~0.2"
+//! ```
+//!
+//! To enable `reqwest` but not `hyper` support:
+//!
+//! ```toml
+//! [dependencies.owo]
+//! default-features = false
+//! features = ["reqwest"]
+//! version = "~0.2"
+//! ```
+//!
+//! ### Examples
+//!
+//! Using reqwest, upload a file by its filepath as a string taken from user
+//! input, with a token taken from an environment variable:
+//!
+//! ```rust,no_run
+//! extern crate owo;
+//! # #[cfg(feature = "reqwest")]
+//! extern crate reqwest;
+//!
+//! # #[cfg(feature = "reqwest")]
+//! # fn main() {
+//! #
+//! use owo::OwoReqwestRequester;
+//! use reqwest::Client;
+//! use std::fs::File;
+//! use std::io::{self, Read, Write};
+//! use std::env;
+//!
+//! // Read a filepath to upload from user input:
+//! let mut path = String::new();
+//! print!("Enter the path on the filesystem to upload:\n>");
+//! let _ = io::stdout().flush();
+//! let _ = io::stdin().read_line(&mut path);
+//!
+//! // Read the file to a buffer of bytes
+//! let mut buffer = vec![];
+//! let mut file = File::open(path).expect("Error opening file");
+//! file.read_to_end(&mut buffer).expect("Error reading file");
+//!
+//! // Retrieve the token from an environment variable named "OWO_TOKEN".
+//! let token = env::var("OWO_TOKEN").expect("OWO_TOKEN env missing");
+//!
+//! // Create the reqwest Client.
+//! //
+//! // In this case, we're using the client for a oneshot request, but in
+//! // normal cases a client can be re-used.
+//! let client = Client::new();
+//!
+//! let response = client.upload_file(&token, buffer).expect("Err in request");
+//!
+//! println!("Response: {:?}", response);
+//! # }
+//! #
+//! # #[cfg(not(feature = "reqwest"))]
+//! # fn main() { }
+//! ```
+//!
+//! For more examples, refer to the [examples] folder or the [documentation].
+//!
+//! ### License
+//!
+//! ISC.
+//!
+//! [documentation]: https://docs.rs/owo
+//! [examples]: https://github.com/whats-this/owo.rs/blob/master/examples
+#![deny(missing_docs)]
 
-fn get_content(url: &str) {
-    let mut easy = Easy::new();
-    easy.url(&format!("{}", url )).unwrap();
-    easy.write_function(|data| {
-    Ok(stdout().write(data).unwrap())
-    }).unwrap();
-    easy.perform().unwrap();
-}
+#[cfg(feature = "hyper")]
+extern crate hyper;
+#[cfg(feature = "hyper-tls")]
+extern crate hyper_tls;
+#[cfg(feature = "multipart")]
+extern crate multipart;
+#[cfg(feature = "multipart-async")]
+extern crate multipart_async;
+#[cfg(feature = "reqwest")]
+extern crate reqwest;
+#[cfg(feature = "serde")]
+extern crate serde;
+#[cfg(feature = "serde_derive")]
+#[macro_use]
+extern crate serde_derive;
+#[cfg(feature = "serde_json")]
+extern crate serde_json;
 
+pub mod bridge;
+pub mod constants;
 
-pub fn shorten(key: &str, s_url: &str) {
-    get_content(&format!("https://api.awau.moe/shorten/polr?action=shorten&key={}&url={}", key, s_url));
-}
-}
+#[cfg(feature = "serde_derive")]
+pub mod model;
 
-pub mod uploader {
-    use std::io::{stdout, Write};
-    extern crate curl;
-    use self::curl::easy::Easy;
-    use self::curl::easy::Form;
-    use std::path::{Path, PathBuf};
-    fn post_content(url: String, files: Vec<PathBuf>) {
-        curl::init();
-    let mut handle = Easy::new();
-    for file in &files {
-        let mut form = Form::new();
-        form.part("file").file(&file).add().unwrap();
+mod error;
 
-        handle.url(&url).unwrap();
-        handle.httppost(form).unwrap();
+pub use error::{Error, Result};
 
-        handle.write_function(|a| {
-            Ok(stdout().write(a).unwrap())
-        }).unwrap();
-
-        handle.perform().unwrap();
-    }
-    }
-    pub fn upload(key: &str, files: Vec<PathBuf>) {
-        post_content(format!("https://api.awau.moe/upload/pomf?key={}", key), files)
-    }
-}
+#[cfg(feature = "hyper")]
+pub use bridge::hyper::OwoRequester as OwoHyperRequester;
+#[cfg(feature = "reqwest")]
+pub use bridge::reqwest::OwoRequester as OwoReqwestRequester;
