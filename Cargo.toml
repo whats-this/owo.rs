@@ -11,6 +11,10 @@ version = "~0.11"
 optional = true
 version = "~0.1"
 
+[dependencies.native-tls]
+optional = true
+version = "~0.1"
+
 [dependencies.reqwest]
 optional = true
 version = "~0.8"
@@ -27,8 +31,12 @@ version = "^1.0"
 optional = true
 version = "^1.0"
 
+[dependencies.tokio-core]
+optional = true
+version = "~0.1"
+
 [features]
 default = ["reqwest-support"]
-hyper-support = ["hyper", "hyper-tls"]
+hyper-support = ["hyper", "hyper-tls", "native-tls", "tokio-core"]
 reqwest-support = ["reqwest", "serde-items"]
 serde-items = ["serde", "serde_derive", "serde_json"]

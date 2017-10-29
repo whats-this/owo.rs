@@ -4,6 +4,8 @@ use std::result::Result as StdResult;
 
 #[cfg(feature = "hyper")]
 use hyper::error::UriError;
+#[cfg(feature = "native-tls")]
+use native_tls::Error as NativeTlsError;
 #[cfg(feature = "reqwest")]
 use std::io::Error as IoError;
 #[cfg(feature = "serde_json")]
@@ -30,6 +32,9 @@ pub enum Error {
     /// JSON response body.
     #[cfg(feature = "serde_json")]
     Json(JsonError),
+    /// An error from the `native-tls` crate.
+    #[cfg(feature = "native-tls")]
+    NativeTls(NativeTlsError),
     /// An error from the `reqwest` crate when it is enabled.
     #[cfg(feature = "reqwest")]
     Reqwest(ReqwestError),
@@ -53,6 +58,8 @@ impl Display for Error {
             Error::Io(ref inner) => inner.fmt(f),
             #[cfg(feature = "serde_json")]
             Error::Json(ref inner) => inner.fmt(f),
+            #[cfg(feature = "native-tls")]
+            Error::NativeTls(ref inner) => inner.fmt(f),
             #[cfg(feature = "reqwest")]
             Error::Reqwest(ref inner) => inner.fmt(f),
             Error::TooManyFiles => f.write_str("Too many files to upload"),
@@ -69,12 +76,21 @@ impl StdError for Error {
             Error::Io(ref inner) => inner.description(),
             #[cfg(feature = "serde_json")]
             Error::Json(ref inner) => inner.description(),
+            #[cfg(feature = "native-tls")]
+            Error::NativeTls(ref inner) => inner.description(),
             #[cfg(feature = "reqwest")]
             Error::Reqwest(ref inner) => inner.description(),
             Error::TooManyFiles => "Too many files to upload",
             #[cfg(feature = "hyper")]
             Error::Uri(ref inner) => inner.description(),
         }
+    }
+}
+
+#[cfg(feature = "native-tls")]
+impl From<NativeTlsError> for Error {
+    fn from(err: NativeTlsError) -> Error {
+        Error::NativeTls(err)
     }
 }
 

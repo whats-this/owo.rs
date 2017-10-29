@@ -103,6 +103,8 @@ extern crate hyper_tls;
 extern crate multipart;
 #[cfg(feature = "multipart-async")]
 extern crate multipart_async;
+#[cfg(feature = "native-tls")]
+extern crate native_tls;
 #[cfg(feature = "reqwest")]
 extern crate reqwest;
 #[cfg(feature = "serde")]
@@ -112,6 +114,8 @@ extern crate serde;
 extern crate serde_derive;
 #[cfg(feature = "serde_json")]
 extern crate serde_json;
+#[cfg(feature = "tokio-core")]
+extern crate tokio_core;
 
 pub mod bridge;
 pub mod constants;
@@ -125,5 +129,9 @@ pub use error::{Error, Result};
 
 #[cfg(feature = "hyper")]
 pub use bridge::hyper::OwoRequester as OwoHyperRequester;
+#[cfg(feature = "hyper")]
+pub use bridge::hyper::OwoClient as OwoHyperClient;
 #[cfg(feature = "reqwest")]
 pub use bridge::reqwest::OwoRequester as OwoReqwestRequester;
+#[cfg(feature = "reqwest")]
+pub use bridge::reqwest::OwoClient as OwoReqwestClient;

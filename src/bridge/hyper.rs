@@ -10,7 +10,105 @@ use hyper::client::{Client as HyperClient, FutureResponse, HttpConnector};
 use hyper::{Body, Method, Request, Uri};
 use hyper_tls::HttpsConnector;
 use std::str::FromStr;
-use ::Result;
+use tokio_core::reactor::Handle;
+use ::{constants, Result};
+
+/// A light wrapper around a hyper Client, containing the client and the key to
+/// use in requests.
+///
+/// This is a bit less inefficient than using your own client and storing your
+/// own key elsewhere, due to this wrapper owning its own client and key. For
+/// the best performance on memory, manage your own hyper Client for re-use
+/// across multiple services.
+///
+/// Refer to [`OwoRequester`] for more information.
+///
+/// [`OwoRequester`]: trait.OwoRequester.html
+pub struct OwoClient {
+    client: HyperClient<HttpsConnector<HttpConnector>, Body>,
+    /// The key in use by the client.
+    pub key: String,
+}
+
+impl OwoClient {
+    /// Creates a new client.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// extern crate owo;
+    /// extern crate tokio_core;
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #
+    /// use owo::OwoHyperClient;
+    /// use std::env;
+    /// use tokio_core::reactor::Core;
+    ///
+    /// let core = Core::new()?;
+    /// let handle = core.handle();
+    /// let client = OwoHyperClient::new(env::var("OWO_TOKEN")?, &handle);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::NativeTls`] if there was an error instantiating the
+    /// HTTPS connector.
+    ///
+    /// [`Error::NativeTls`]: ../../enum.Error.html#variant.NativeTls
+    pub fn new<S: Into<String>>(key: S, handle: &Handle) -> Result<Self> {
+        let connector = HttpsConnector::new(4, handle)?;
+        let client = HyperClient::configure()
+            .connector(connector)
+            .build(handle);
+
+        Ok(Self {
+            key: key.into(),
+            client,
+        })
+    }
+
+    /// Shortcut for shortening a URL.
+    ///
+    /// Refer to [`OwoRequester::upload_files`] for more information.
+    ///
+    /// # Examples
+    ///
+    /// Shorten the URL `"https://google.com"`, using a key from the
+    /// environment:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #
+    /// use owo::OwoReqwestClient;
+    /// use std::env;
+    ///
+    /// let client = OwoReqwestClient::new(env::var("OWO_TOKEN")?);
+    ///
+    /// println!("Response: {:?}", client.shorten_url("https://google.com")?);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
+    ///
+    /// [`OwoRequester::upload_files`]: trait.OwoRequester.html#tymethod.upload_files
+    #[inline]
+    pub fn shorten_url(&self, url: &str) -> Result<FutureResponse> {
+        self.client.shorten_url(&self.key, url)
+    }
+}
 
 /// Trait which defines the methods necessary to interact with the service.
 ///
@@ -33,15 +131,17 @@ pub trait OwoRequester {
     /// environment variable for the key:
     ///
     /// ```rust,ignore
+    /// extern crate futures;
     /// extern crate hyper;
     /// extern crate hyper_tls;
     /// extern crate owo;
     /// extern crate tokio_core;
     ///
+    /// use futures::future::Future;
+    /// use hyper::Client;
     /// use hyper_tls::HttpsConnector;
     /// use owo::OwoHyperRequester;
-    /// use hyper::Client;
-    /// use std::env;
+    /// use std::{env, io};
     /// use tokio_core::reactor::Core;
     ///
     /// let key = env::var("OWO_TOKEN")?;

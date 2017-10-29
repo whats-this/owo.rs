@@ -13,6 +13,180 @@ use std::io::{Cursor, Read};
 use ::model::FileUploadResponse;
 use ::{Error, Result, constants};
 
+/// A light wrapper around a reqwest Client, containing the client and the
+/// key to use in requests.
+///
+/// This is a bit less inefficient than using your own client and storing your
+/// own key elsewhere, due to this wrapper owning its own client and key. For
+/// the best performance on memory, manage your own reqwest Client for re-use
+/// across multiple services and key.
+///
+/// Refer to [`OwoRequester`] for more information.
+///
+/// [`OwoRequester`]: trait.OwoRequester.html
+pub struct OwoClient {
+    client: Client,
+    /// The key in use by the client.
+    pub key: String,
+}
+
+impl OwoClient {
+    /// Creates a new client.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #
+    /// use owo::OwoReqwestClient;
+    /// use std::env;
+    ///
+    /// let client = OwoReqwestClient::new(env::var("OWO_KEY")?);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    pub fn new<S: Into<String>>(key: S) -> Self {
+        Self {
+            client: Client::new(),
+            key: key.into(),
+        }
+    }
+
+    /// Shortcut for uploading a file.
+    ///
+    /// Refer to [`OwoRequester::upload_file`] for more information.
+    ///
+    /// # Examples
+    ///
+    /// Upload a file from the CWD, using a key from the environment:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #
+    /// use owo::OwoReqwestClient;
+    /// use std::env;
+    /// use std::fs::File;
+    /// use std::io::Read;
+    ///
+    /// let client = OwoReqwestClient::new(env::var("OWO_KEY")?);
+    ///
+    /// let mut buffer = vec![];
+    /// let mut file = File::open("./file.png")?;
+    /// file.read_to_end(&mut buffer)?;
+    ///
+    /// println!("Response: {:?}", client.upload_file(buffer)?);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Reqwest`] if building the request fails.
+    ///
+    /// [`Error::Reqwest`]: ../../enum.Error.html#variant.Reqwest
+    /// [`OwoRequester::upload_file`]: trait.OwoRequester.html#tymethod.upload_file
+    #[inline]
+    pub fn upload_file(&self, file: Vec<u8>) -> Result<FileUploadResponse> {
+        self.client.upload_file(&self.key, file)
+    }
+
+    /// Shortcut for uploading multiple files.
+    ///
+    /// Refer to [`OwoRequester::upload_files`] for more information.
+    ///
+    /// # Examples
+    ///
+    /// Upload two files from the CWD, using a key from the environment:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #
+    /// use owo::OwoReqwestClient;
+    /// use std::env;
+    /// use std::fs::File;
+    /// use std::io::Read;
+    ///
+    /// let client = OwoReqwestClient::new(env::var("OWO_KEY")?);
+    ///
+    /// let mut buffer1 = vec![];
+    /// let mut file1 = File::open("./file1.png")?;
+    /// file1.read_to_end(&mut buffer1)?;
+    ///
+    /// let mut buffer2 = vec![];
+    /// let mut file2 = File::open("./file2.png")?;
+    /// file2.read_to_end(&mut buffer2)?;
+    ///
+    /// let buffers = vec![buffer1, buffer2];
+    ///
+    /// println!("Response: {:?}", client.upload_files(buffers));
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Reqwest`] if building the request fails.
+    ///
+    /// [`Error::Reqwest`]: ../../enum.Error.html#variant.Reqwest
+    /// [`OwoRequester::upload_files`]: trait.OwoRequester.html#tymethod.upload_files
+    #[inline]
+    pub fn upload_files(&self, files: Vec<Vec<u8>>)
+        -> Result<FileUploadResponse> {
+        self.client.upload_files(&self.key, files)
+    }
+
+    /// Shortcut for shortening a URL.
+    ///
+    /// Refer to [`OwoRequester::upload_files`] for more information.
+    ///
+    /// # Examples
+    ///
+    /// Shorten the URL `"https://google.com"`, using a key from the
+    /// environment:
+    ///
+    /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #
+    /// use owo::OwoReqwestClient;
+    /// use std::env;
+    ///
+    /// let client = OwoReqwestClient::new(env::var("OWO_KEY")?);
+    ///
+    /// println!("Response: {:?}", client.shorten_url("https://google.com")?);
+    /// #     Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #     try_main().unwrap();
+    /// # }
+    /// ```
+    ///
+    /// [`OwoRequester::upload_files`]: trait.OwoRequester.html#tymethod.upload_files
+    #[inline]
+    pub fn shorten_url(&self, url: &str) -> Result<String> {
+        self.client.shorten_url(&self.key, url)
+    }
+}
+
 /// Trait which defines the methods necessary to interact with the service.
 ///
 /// # Examples
