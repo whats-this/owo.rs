@@ -49,7 +49,7 @@ fn test_upload_files() {
     let res = client.upload_files(&key, vec![buffer1, buffer2]).unwrap();
 
     assert!(res.success);
-    assert!(res.files.len() == 2);
+    assert_eq!(res.files.len(), 2);
 
     for file in res.files {
         assert_eq!(file.name, None);
