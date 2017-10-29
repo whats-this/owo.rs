@@ -7,6 +7,7 @@
 //! [`OwoRequester`]: trait.OwoRequester.html
 
 use hyper::client::{Client as HyperClient, FutureResponse, HttpConnector};
+use hyper::header::UserAgent;
 use hyper::{Body, Method, Request, Uri};
 use hyper_tls::HttpsConnector;
 use std::str::FromStr;
@@ -181,7 +182,8 @@ impl OwoRequester for HyperClient<HttpsConnector<HttpConnector>, Body> {
             key,
         );
         let uri = Uri::from_str(&req_url)?;
-        let request = Request::new(Method::Get, uri);
+        let mut request = Request::new(Method::Get, uri);
+        request.headers_mut().set(UserAgent::new(constants::USER_AGENT));
 
         Ok(self.request(request))
     }

@@ -6,6 +6,7 @@
 //!
 //! [`OwoRequester`]: trait.OwoRequester.html
 
+use reqwest::header::{Headers, UserAgent};
 use reqwest::multipart::{Form, Part};
 use reqwest::Client;
 use serde_json;
@@ -385,7 +386,9 @@ impl OwoRequester for Client {
             key,
         );
 
-        let mut response = self.get(&uri).send()?;
+        let mut headers = Headers::new();
+        headers.set(UserAgent::new(constants::USER_AGENT));
+        let mut response = self.get(&uri).headers(headers).send()?;
         let mut buffer = String::new();
         response.read_to_string(&mut buffer)?;
 
@@ -395,7 +398,11 @@ impl OwoRequester for Client {
 
 fn upload(client: &Client, uri: &str, form: Form)
     -> Result<FileUploadResponse> {
-    let reader = client.post(uri).multipart(form).send()?;
+        let reader = client
+            .post(uri)
+            .multipart(form)
+            .header(UserAgent::new(constants::USER_AGENT))
+            .send()?;
 
     serde_json::from_reader(reader).map_err(From::from)
 }

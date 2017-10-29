@@ -9,3 +9,9 @@ pub const MAX_FILES: usize = 3;
 pub const SHORTEN_URL: &'static str = "https://api.awau.moe/shorten/polr?action=shorten&url={}&key={}";
 /// The URL to POST to, to upload files.
 pub const UPLOAD_URL: &'static str = "https://api.awau.moe/upload/pomf?key={}";
+/// The user agent to send along with requests.
+pub const USER_AGENT: &'static str = concat!(
+    "WhatsThisClient (https://github.com/whats-this/owo.rs, ",
+    env!("CARGO_PKG_VERSION"),
+    ")",
+);
