@@ -6,6 +6,8 @@
 //!
 //! [`OwoRequester`]: trait.OwoRequester.html
 
+pub mod oneshot;
+
 use hyper::client::{Client as HyperClient, FutureResponse, HttpConnector};
 use hyper::header::UserAgent;
 use hyper::{Body, Method, Request, Uri};
