@@ -18,19 +18,19 @@ fn read(relative_path: &str) -> Vec<u8> {
 }
 
 #[inline]
-fn token() -> String {
-    env::var("OWO_TOKEN").expect("OWO_TOKEN env var not present")
+fn key() -> String {
+    env::var("OWO_KEY").expect("OWO_KEY env var not present")
 }
 
 #[ignore]
 #[test]
 fn test_upload_file() {
-    let token = token();
+    let key = key();
     let client = Client::new();
 
     let buffer = read("tests/resources/cat.png");
 
-    let res = client.upload_file(&token, buffer).expect("file err");
+    let res = client.upload_file(&key, buffer).expect("file err");
 
     assert!(res.success);
     assert_eq!(res.files[0].name, None);
@@ -40,13 +40,13 @@ fn test_upload_file() {
 #[ignore]
 #[test]
 fn test_upload_files() {
-    let token = token();
+    let key = key();
     let client = Client::new();
 
     let buffer1 = read("tests/resources/cat.png");
     let buffer2 = read("tests/resources/horse.png");
 
-    let res = client.upload_files(&token, vec![buffer1, buffer2]).unwrap();
+    let res = client.upload_files(&key, vec![buffer1, buffer2]).unwrap();
 
     assert!(res.success);
     assert!(res.files.len() == 2);
@@ -60,10 +60,10 @@ fn test_upload_files() {
 #[ignore]
 #[test]
 fn test_shorten_url() {
-    let token = token();
+    let key = key();
     let client = Client::new();
 
-    let res = client.shorten_url(&token, "https://google.com")
+    let res = client.shorten_url(&key, "https://google.com")
         .expect("shorten err");
 
     assert!(res.len() > 1);

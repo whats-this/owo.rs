@@ -40,7 +40,7 @@
 //! ### Examples
 //!
 //! Using reqwest, upload a file by its filepath as a string taken from user
-//! input, with a token taken from an environment variable:
+//! input, with a key taken from an environment variable:
 //!
 //! ```rust,no_run
 //! extern crate owo;
@@ -67,8 +67,8 @@
 //! let mut file = File::open(path).expect("Error opening file");
 //! file.read_to_end(&mut buffer).expect("Error reading file");
 //!
-//! // Retrieve the token from an environment variable named "OWO_TOKEN".
-//! let token = env::var("OWO_TOKEN").expect("OWO_TOKEN env missing");
+//! // Retrieve the key from an environment variable named "OWO_KEY".
+//! let key = env::var("OWO_KEY").expect("OWO_KEY env missing");
 //!
 //! // Create the reqwest Client.
 //! //
@@ -76,7 +76,7 @@
 //! // normal cases a client can be re-used.
 //! let client = Client::new();
 //!
-//! let response = client.upload_file(&token, buffer).expect("Err in request");
+//! let response = client.upload_file(&key, buffer).expect("Err in request");
 //!
 //! println!("Response: {:?}", response);
 //! # }

@@ -31,7 +31,7 @@ pub trait OwoRequester {
     /// # Examples
     ///
     /// Upload a file by its filepath as a string taken from user input, with a
-    /// token taken from an environment variable:
+    /// key taken from an environment variable:
     ///
     /// ```rust,no_run
     /// # use std::error::Error;
@@ -58,8 +58,8 @@ pub trait OwoRequester {
     /// let mut buffer = vec![];
     /// file.read_to_end(&mut buffer)?;
     ///
-    /// // Retrieve the token from an environment variable named "OWO_TOKEN".
-    /// let token = env::var("OWO_TOKEN")?;
+    /// // Retrieve the key from an environment variable named "OWO_KEY".
+    /// let key = env::var("OWO_KEY")?;
     ///
     /// // Create the reqwest Client.
     /// //
@@ -67,7 +67,7 @@ pub trait OwoRequester {
     /// // normal cases a client can be re-used.
     /// let client = Client::new();
     ///
-    /// let response = client.upload_file(&token, buffer);
+    /// let response = client.upload_file(&key, buffer);
     ///
     /// println!("Response: {:?}", response);
     /// #     Ok(())
@@ -107,7 +107,7 @@ pub trait OwoRequester {
     ///
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #
-    /// let token = env::var("OWO_TOKEN")?;
+    /// let key = env::var("OWO_KEY")?;
     /// let client = Client::new();
     ///
     /// let mut cat1 = File::open("/mnt/media/images/cat1.png")?;
@@ -118,7 +118,7 @@ pub trait OwoRequester {
     /// let mut buffer2 = vec![];
     /// cat2.read_to_end(&mut buffer2)?;
     ///
-    /// let responses = client.upload_files(&token, vec![buffer1, buffer2]);
+    /// let responses = client.upload_files(&key, vec![buffer1, buffer2]);
     ///
     /// for (idx, response) in responses.iter().enumerate() {
     ///     println!("#{} response: {:?}", idx, response);
@@ -158,12 +158,12 @@ pub trait OwoRequester {
     ///
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #
-    /// let token = env::var("OWO_TOKEN")?;
+    /// let key = env::var("OWO_KEY")?;
     /// let client = Client::new();
     ///
     /// let url_to_shorten = "https://google.com";
     ///
-    /// let url = client.shorten_url(&token, url_to_shorten)?;
+    /// let url = client.shorten_url(&key, url_to_shorten)?;
     ///
     /// println!("url: {}", url);
     /// #     Ok(())

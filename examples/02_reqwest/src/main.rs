@@ -9,9 +9,9 @@ use std::env;
 
 // You would want to handle results in a normal program.
 fn main() {
-    // Retrieve the token from an environment variable named "OWO_TOKEN".
-    let token = env::var("OWO_TOKEN")
-        .expect("Must provide OWO_TOKEN as an environment variable");
+    // Retrieve the key from an environment variable named "OWO_KEY".
+    let key = env::var("OWO_KEY")
+        .expect("Must provide OWO_KEY as an environment variable");
 
     // Create the reqwest Client.
     let client = Client::new();
@@ -28,7 +28,7 @@ fn main() {
     let mut buffer = vec![];
     file.read_to_end(&mut buffer).expect("Error reading file");
 
-    let response = client.upload_file(&token, buffer);
+    let response = client.upload_file(&key, buffer);
 
     println!("Response: {:?}", response);
 }
