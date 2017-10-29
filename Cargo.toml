@@ -12,8 +12,8 @@ optional = true
 version = "~0.1"
 
 [dependencies.reqwest]
-git = "https://github.com/seanmonstar/reqwest"
 optional = true
+version = "~0.8"
 
 [dependencies.serde]
 optional = true
