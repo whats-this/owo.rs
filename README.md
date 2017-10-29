@@ -1,4 +1,6 @@
-# owo.rs
+# OwO.rs
+
+[![ci-badge][]][ci] [![docs-badge][]][docs]
 
 A Rust client for the owo.whats-th.is API, offering implementations for both
 asynchronous hyper (v0.11) and synchronous reqwest (v0.7).
@@ -73,17 +75,28 @@ fn main() {
     // normal cases a client can be re-used.
     let client = Client::new();
 
-    let response = client.upload_file(&token, buffer).expect("Err in request");
+    let response = client.upload_file(&key, buffer).expect("Err in request");
 
     println!("Response: {:?}", response);
 }
 ```
 
-For more examples, refer to the [examples] folder or the [documentation].
+For more examples, refer to the [examples] folder or the [documentation][docs].
+
+### Contributing
+
+Pull requests are accepted. Make sure you add test suites for new features and
+make sure the code passes the spec (so the build doesn't break). Tests are
+automatically run when commits are made in a pull request.
 
 ### License
 
-ISC.
+The contents of this repository are licensed under the MIT license. A copy of
+the MIT license can be found in [LICENSE.md].
 
-[documentation]: https://docs.rs/owo
+[ci]: https://travis-ci.org/whats-this/owo.rs
+[ci-badge]: https://travis-ci.org/whats-this/owo.rs.svg?branch=master
+[docs]: https://docs.rs/owo
+[docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg
 [examples]: https://github.com/whats-this/owo.rs/blob/master/examples
+[LICENSE.md]: https://github.com/whats-this/owo.rs/blob/master/LICENSE.md
